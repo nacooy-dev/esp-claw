@@ -1,0 +1,48 @@
+name: build-cyberz
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cyberz
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ESP-IDF v5.5.4
+        uses: uraimo/install-esp-idf@v2
+        with:
+          version: v5.5.4
+
+      - name: Install esp-bmgr-assist
+        run: |
+          . $IDF_PATH/export.sh
+          pip install esp-bmgr-assist
+
+      - name: Generate board codes
+        working-directory: application/edge_agent
+        run: |
+          . $IDF_PATH/export.sh
+          idf.py bmgr -c ./boards -b cyberz
+
+      - name: Build firmware
+        working-directory: application/edge_agent
+        run: |
+          . $IDF_PATH/export.sh
+          idf.py set-target esp32s3
+          idf.py build
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyberz-firmware
+          path: |
+            application/edge_agent/build/bootloader/bootloader.bin
+            application/edge_agent/build/partition_table/bin/partition-table.bin
+            application/edge_agent/build/edge_agent.bin
+            application/edge_agent/build/ota_data_initial.bin
+            application/edge_agent/build/*.bin

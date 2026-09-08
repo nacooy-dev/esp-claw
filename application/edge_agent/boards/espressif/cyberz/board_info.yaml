@@ -1,0 +1,4 @@
+board: cyberz
+chip: esp32s3
+description: "CyberZ - ESP32-S3-DevKitC-1 + ST7789 2.8inch + TGAM1"
+manufacturer: "CyberZ"
