@@ -1,0 +1,5 @@
+board: esp32_s3_st7735s
+chip: esp32s3
+version: 1.0.0
+description: "ESP32-S3-DevKitC-1 + ST7735S 128x160 Display + TGAM1"
+manufacturer: "CyberZ"

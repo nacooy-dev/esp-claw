@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [cyberz, esp32_s3_st7735s]
     steps:
       - name: Checkout esp-claw
         uses: actions/checkout@v4
@@ -39,7 +43,7 @@ jobs:
         working-directory: esp-claw/application/edge_agent
         run: |
           . $GITHUB_WORKSPACE/esp-idf/export.sh
-          idf.py bmgr -c ./boards -b cyberz
+          idf.py bmgr -c ./boards -b ${{ matrix.board }}
 
       - name: Build firmware
         working-directory: esp-claw/application/edge_agent
@@ -51,7 +55,7 @@ jobs:
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: cyberz-firmware
+          name: firmware-${{ matrix.board }}
           path: |
             esp-claw/application/edge_agent/build/bootloader/bootloader.bin
             esp-claw/application/edge_agent/build/partition_table/bin/partition-table.bin
