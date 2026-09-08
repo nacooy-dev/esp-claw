@@ -10,29 +10,41 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout esp-claw
         uses: actions/checkout@v4
-
-      - name: Install ESP-IDF v5.5.4
-        uses: uraimo/install-esp-idf@v2
         with:
-          version: v5.5.4
+          path: esp-claw
+
+      - name: Checkout ESP-IDF v5.5.4
+        uses: actions/checkout@v4
+        with:
+          repository: espressif/esp-idf
+          ref: v5.5.4
+          path: esp-idf
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ESP-IDF toolchain
+        run: cd esp-idf && ./install.sh esp32s3
 
       - name: Install esp-bmgr-assist
         run: |
-          . $IDF_PATH/export.sh
+          . $GITHUB_WORKSPACE/esp-idf/export.sh
           pip install esp-bmgr-assist
 
       - name: Generate board codes
-        working-directory: application/edge_agent
+        working-directory: esp-claw/application/edge_agent
         run: |
-          . $IDF_PATH/export.sh
+          . $GITHUB_WORKSPACE/esp-idf/export.sh
           idf.py bmgr -c ./boards -b cyberz
 
       - name: Build firmware
-        working-directory: application/edge_agent
+        working-directory: esp-claw/application/edge_agent
         run: |
-          . $IDF_PATH/export.sh
+          . $GITHUB_WORKSPACE/esp-idf/export.sh
           idf.py set-target esp32s3
           idf.py build
 
@@ -41,8 +53,8 @@ jobs:
         with:
           name: cyberz-firmware
           path: |
-            application/edge_agent/build/bootloader/bootloader.bin
-            application/edge_agent/build/partition_table/bin/partition-table.bin
-            application/edge_agent/build/edge_agent.bin
-            application/edge_agent/build/ota_data_initial.bin
-            application/edge_agent/build/*.bin
+            esp-claw/application/edge_agent/build/bootloader/bootloader.bin
+            esp-claw/application/edge_agent/build/partition_table/bin/partition-table.bin
+            esp-claw/application/edge_agent/build/edge_agent.bin
+            esp-claw/application/edge_agent/build/ota_data_initial.bin
+            esp-claw/application/edge_agent/build/*.bin
