@@ -35,6 +35,7 @@ static const char *TAG = "LCD_TEST";
 
 static esp_lcd_panel_handle_t s_panel = NULL;
 static esp_lcd_panel_io_handle_t s_io = NULL;
+static uint16_t *s_fb = NULL;  /* full-frame buffer for fill */
 
 static esp_err_t init_backlight(void)
 {
@@ -127,11 +128,20 @@ void app_main(void)
     const char *names[] = {"RED", "GREEN", "BLUE", "WHITE", "MAGENTA", "CYAN"};
     const int n = sizeof(colors) / sizeof(colors[0]);
 
+    s_fb = malloc(H_RES * V_RES * sizeof(uint16_t));
+    if (!s_fb) {
+        ESP_LOGE(TAG, "framebuffer alloc failed");
+        return;
+    }
+
     while (1) {
         for (int i = 0; i < n; i++) {
-            esp_err_t ret = esp_lcd_panel_fill_color(s_panel, 0, 0, H_RES, V_RES, colors[i]);
+            for (int p = 0; p < H_RES * V_RES; p++) {
+                s_fb[p] = colors[i];
+            }
+            esp_err_t ret = esp_lcd_panel_draw_bitmap(s_panel, 0, 0, H_RES, V_RES, s_fb);
             if (ret != ESP_OK) {
-                ESP_LOGE(TAG, "fill_color %s FAILED: %s", names[i], esp_err_to_name(ret));
+                ESP_LOGE(TAG, "draw_bitmap %s FAILED: %s", names[i], esp_err_to_name(ret));
             } else {
                 ESP_LOGI(TAG, ">> screen should be %s now <<", names[i]);
             }
