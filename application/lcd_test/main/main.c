@@ -18,7 +18,7 @@
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_io_spi.h"
 #include "esp_lcd_panel_ops.h"
-#include "esp_lcd_st7789.h"
+#include "esp_lcd_panel_st7789.h"
 
 static const char *TAG = "LCD_TEST";
 
