@@ -142,10 +142,10 @@ void app_main(void)
             esp_err_t ret = esp_lcd_panel_draw_bitmap(s_panel, 0, 0, H_RES, V_RES, s_fb);
             if (ret != ESP_OK) {
                 ESP_LOGE(TAG, "draw_bitmap %s FAILED: %s", names[i], esp_err_to_name(ret));
-            } else {
-                ESP_LOGI(TAG, ">> screen should be %s now <<", names[i]);
+            } else if ((i % 6) == 0) {
+                ESP_LOGI(TAG, ">> drawing %s (continuous) <<", names[i]);
             }
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            /* continuous: no delay, SPI stays active */
         }
     }
 }
