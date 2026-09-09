@@ -16,7 +16,7 @@
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_io_spi.h"
+#include "esp_lcd_io_spi.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_st7789.h"
 
@@ -93,7 +93,7 @@ static esp_err_t init_panel(void)
         .lcd_param_bits = 8,
         .flags = { .use_dma = true },
     };
-    ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_spi(&io_config, &s_io), TAG, "panel io create");
+    ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_spi(SPI3_HOST, &io_config, &s_io), TAG, "panel io create");
     ESP_LOGI(TAG, "panel IO created: DC=GPIO%d CS=GPIO%d @40MHz", PIN_DC, PIN_CS);
 
     const esp_lcd_st7789_config_t panel_config = {

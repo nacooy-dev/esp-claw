@@ -17,7 +17,7 @@
 #include "esp_err.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
-#include "esp_lcd_st7789.h"
+#include "esp_lcd_panel_st7789.h"
 
 static const char *TAG = "ESP32_S3_ST7735S";
 
