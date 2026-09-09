@@ -58,7 +58,48 @@ jobs:
           name: firmware-${{ matrix.board }}
           path: |
             esp-claw/application/edge_agent/build/bootloader/bootloader.bin
-            esp-claw/application/edge_agent/build/partition_table/bin/partition-table.bin
+            esp-claw/application/edge_agent/build/partition_table/partition-table.bin
             esp-claw/application/edge_agent/build/edge_agent.bin
             esp-claw/application/edge_agent/build/ota_data_initial.bin
             esp-claw/application/edge_agent/build/*.bin
+
+  # Minimal ST7789 driver test (bypasses ESP-Claw; isolates hardware from
+  # the ESP-Claw display stack)
+  build-lcd-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout esp-claw
+        uses: actions/checkout@v4
+        with:
+          path: esp-claw
+
+      - name: Checkout ESP-IDF v5.5.4
+        uses: actions/checkout@v4
+        with:
+          repository: espressif/esp-idf
+          ref: v5.5.4
+          path: esp-idf
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ESP-IDF toolchain
+        run: cd esp-idf && ./install.sh esp32s3
+
+      - name: Build lcd_test
+        working-directory: esp-claw/application/lcd_test
+        run: |
+          . $GITHUB_WORKSPACE/esp-idf/export.sh
+          idf.py set-target esp32s3
+          idf.py build
+
+      - name: Upload lcd_test artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lcd-test-firmware
+          path: |
+            esp-claw/application/lcd_test/build/bootloader/bootloader.bin
+            esp-claw/application/lcd_test/build/partition_table/partition-table.bin
+            esp-claw/application/lcd_test/build/lcd_test.bin
