@@ -5,7 +5,8 @@
  *   SCLK -> GPIO4, MOSI -> GPIO5, CS -> GPIO15, DC -> GPIO7,
  *   RST  -> GPIO6, BL   -> GPIO16
  *
- * Runs a solid-color loop (2s each) and logs every step over UART (115200).
+ * Uses only IDF built-in esp_lcd (st7789 driver). Solid-color loop,
+ * every step logged over UART (115200).
  */
 
 #include <stdint.h>
@@ -62,8 +63,11 @@ static esp_err_t init_spi_bus(void)
         .data5_io_num = -1,
         .data6_io_num = -1,
         .data7_io_num = -1,
+        .data_io_default_level = false,
         .max_transfer_sz = H_RES * V_RES * sizeof(uint16_t),
-        .flags = { .spi_mode = 0 },
+        .flags = 0,
+        .isr_cpu_id = ESP_INTR_CPU_AFFINITY_AUTO,
+        .intr_flags = 0,
     };
     esp_err_t ret = spi_bus_initialize(SPI3_HOST, &buscfg, SPI_DMA_CH_AUTO);
     if (ret == ESP_ERR_INVALID_STATE) {
@@ -71,47 +75,44 @@ static esp_err_t init_spi_bus(void)
         return ESP_OK;
     }
     ESP_RETURN_ON_ERROR(ret, TAG, "spi_bus_initialize");
-    ESP_LOGI(TAG, "SPI3 initialized: SCLK=GPIO%d MOSI=GPIO%d", PIN_SCLK, PIN_MOSI);
+    ESP_LOGI(TAG, "SPI3 bus initialized: SCLK=GPIO%d MOSI=GPIO%d", PIN_SCLK, PIN_MOSI);
     return ESP_OK;
 }
 
 static esp_err_t init_panel(void)
 {
-    // Reset sequence
-    gpio_set_direction(PIN_RST, GPIO_MODE_OUTPUT);
-    gpio_set_level(PIN_RST, 0);
-    vTaskDelay(pdMS_TO_TICKS(120));
-    gpio_set_level(PIN_RST, 1);
-    vTaskDelay(pdMS_TO_TICKS(120));
-    ESP_LOGI(TAG, "RST pulse sent (GPIO%d)", PIN_RST);
-
     const esp_lcd_panel_io_spi_config_t io_config = {
         .dc_gpio_num = PIN_DC,
         .cs_gpio_num = PIN_CS,
+        .spi_mode = 0,
         .pclk_hz = 40000000,
+        .trans_queue_depth = 2,
+        .on_color_trans_done = NULL,
+        .user_ctx = NULL,
         .lcd_cmd_bits = 8,
         .lcd_param_bits = 8,
-        .flags = { .use_dma = true },
+        .cs_ena_pretrans = 0,
+        .cs_ena_posttrans = 0,
+        .flags = {0},
     };
     ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_spi(SPI3_HOST, &io_config, &s_io), TAG, "panel io create");
     ESP_LOGI(TAG, "panel IO created: DC=GPIO%d CS=GPIO%d @40MHz", PIN_DC, PIN_CS);
 
-    const esp_lcd_st7789_config_t panel_config = {
-        .background_clean = false,
-        .rgb_element_order = LCD_RGB_ELEMENT_ORDER_RGB,
+    const esp_lcd_panel_dev_config_t panel_config = {
+        .reset_gpio_num = PIN_RST,
+        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+        .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
         .bits_per_pixel = 16,
-        .image_polarity_inverse = true,   // invert_color (matches breadboard)
-        .mirror_x = false,
-        .mirror_y = true,                 // matches breadboard
-        .swap_xy = true,                  // matches breadboard
+        .flags = { .reset_active_high = 0 },
+        .vendor_config = NULL,
     };
     ESP_RETURN_ON_ERROR(esp_lcd_new_panel_st7789(s_io, &panel_config, &s_panel), TAG, "st7789 create");
-    ESP_LOGI(TAG, "ST7789 panel object created");
+    ESP_LOGI(TAG, "ST7789 panel object created (RST=GPIO%d)", PIN_RST);
 
     ESP_RETURN_ON_ERROR(esp_lcd_panel_reset(s_panel), TAG, "panel reset");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_init(s_panel), TAG, "panel init");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_disp_on_off(s_panel, true), TAG, "display on");
-    ESP_LOGI(TAG, "panel init + display ON — sending color test now");
+    ESP_LOGI(TAG, "panel init + display ON — color test starting now");
     return ESP_OK;
 }
 
