@@ -80,4 +80,4 @@ peripherals:
       freq_hz: 5000
       duty: 0
       duty_resolution: LEDC_TIMER_10_BIT
-      output_invert: true
+      output_invert: false
