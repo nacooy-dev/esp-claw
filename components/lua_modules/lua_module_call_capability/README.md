@@ -75,7 +75,7 @@ local capability = require("capability")
 local storage = require("storage")
 
 local root = storage.get_root_dir()
-local image_path = storage.join_path(root, "statistics", "ESP-Claw.png")
+local image_path = storage.join_path(root, "statistics", "CyberZ.png")
 local file_path = storage.join_path(root, "reports", "status.json")
 
 local ok1, out1, err1 = capability.call("qq_send_image", {
@@ -147,7 +147,7 @@ print(ok, out, err)
 local capability = require("capability")
 local storage = require("storage")
 
-local image_path = storage.join_path(storage.get_root_dir(), "statistics", "ESP-Claw.png")
+local image_path = storage.join_path(storage.get_root_dir(), "statistics", "CyberZ.png")
 
 local ok, out, err = capability.call("wechat_send_image", {
   chat_id = "wxid_abc123",
