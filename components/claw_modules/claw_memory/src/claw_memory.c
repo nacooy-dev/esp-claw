@@ -295,7 +295,7 @@ esp_err_t claw_memory_init(const claw_memory_config_t *config)
 {
     static const char *const default_markdown =
         "# Long-term Memory\n\n"
-        "(empty - ESP-Claw will write memories here as it learns)\n";
+        "(empty - CyberZ will write memories here as it learns)\n";
     static const char *const default_index =
         "{\"version\":3,\"next_summary_id\":1,\"last_compact_digest_size\":0,\"summaries\":[],\"keyword_index\":{}}\n";
 

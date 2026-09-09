@@ -459,9 +459,9 @@ static cJSON *cap_system_build_version_json(void)
         return NULL;
     }
 
-    // ESP-Claw comes from claw_core; Edge Agent comes from ESP-IDF PROJECT_VER embedded in esp_app_desc.
-    cJSON_AddStringToObject(root, "esp_claw", claw_get_version());
-    cJSON_AddStringToObject(root, "esp_claw_git", claw_get_git_version());
+    // CyberZ agent comes from claw_core; Edge Agent comes from ESP-IDF PROJECT_VER embedded in esp_app_desc.
+    cJSON_AddStringToObject(root, "cyberz", claw_get_version());
+    cJSON_AddStringToObject(root, "cyberz_git", claw_get_git_version());
     cJSON_AddStringToObject(root, "edge_agent", esp_app_get_description()->version);
     cJSON_AddStringToObject(root, "esp_idf", esp_get_idf_version());
     return root;

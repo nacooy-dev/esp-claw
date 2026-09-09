@@ -1,5 +1,5 @@
 export const en = {
-  docTitle: 'ESP-Claw Settings',
+  docTitle: 'CyberZ',
   pageTitle: 'Device Settings',
   pageSubtitle: 'View system operation basic information and status',
 
@@ -10,9 +10,6 @@ export const en = {
   openMenu: 'Open navigation menu',
   toggleSidebar: 'Toggle sidebar',
   closeMenu: 'Close navigation menu',
-  externalHome: 'Home',
-  externalDocs: 'Documentation',
-  externalGithub: 'GitHub',
 
   navStatus: 'System Status',
   navSystemSettings: 'System Settings',
@@ -26,7 +23,7 @@ export const en = {
   navFiles: 'Files',
   navWebIm: 'Web Chat',
 
-  webimDesc: 'Interact with ESP-Claw in real time via WebSocket.',
+  webimDesc: 'Interact with CyberZ in real time via WebSocket.',
   webimSend: 'Send',
   webimOnline: 'Online',
   webimPlaceholder: 'Message…',
@@ -34,6 +31,7 @@ export const en = {
   webimNoBind:
     'Web IM is not connected yet (device still starting or local IM disabled). Wait for the agent to finish booting.',
   webimEmpty: 'No messages',
+  webimThinking: 'Thinking',
   webimPendingFiles: 'Attachments pending send',
   webimUploaded: 'Image uploaded — click Send to post.',
   webimSendShortcut: 'Ctrl+Enter to send',
@@ -180,7 +178,7 @@ export const en = {
   wechatLoginOpenLink: 'Open login link',
 
   sectionWebReqSearch: 'Search',
-  webreqSearchNote: 'Optional. If set, ESP-Claw can search online.',
+  webreqSearchNote: 'Optional. If set, CyberZ can search online.',
   sectionWebReqNetwork: 'Network Requests',
   webreqBraveKey: 'Brave Search API Key',
   webreqTavilyKey: 'Tavily API Key',

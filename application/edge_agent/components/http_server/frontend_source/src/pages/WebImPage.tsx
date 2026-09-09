@@ -26,12 +26,8 @@ import { t } from '../i18n';
 import { pushToast } from '../state/toast';
 
 const LS_CHAT_ID = 'esp-claw-webim-chat-id';
-const MARKED_CDN_URL = 'https://esp-claw.com/clientjs/marked@18.0.4/marked.umd.min.js';
-const DOMPURIFY_CDN_URL = 'https://esp-claw.com/clientjs/dompurify@3.4.5/purify.min.js';
-const MARKED_CDN_INTEGRITY =
-  'sha384-QIom/Ao3tGhg4C4VY5VTDrHMTPzgsih5cGuY30rd/xp6hWQ+xIGIZ4kxhaQQY+PB';
-const DOMPURIFY_CDN_INTEGRITY =
-  'sha384-7FXQySTrDscwsLx1i8RIqZM/JHoUVstx4CuL2b7tziI4Glhp3/3dm/j3qUTheVXE';
+const MARKED_CDN_URL = 'https://cdn.jsdelivr.net/npm/marked@18.0.4/lib/marked.umd.js';
+const DOMPURIFY_CDN_URL = 'https://cdn.jsdelivr.net/npm/dompurify@3.4.5/dist/purify.min.js';
 
 type MarkedRuntime = {
   parse: (text: string, options?: { async?: false }) => string | Promise<string>;
@@ -98,7 +94,7 @@ function escapeMarkdownHtml(text: string): string {
 
 function loadExternalScript(
   src: string,
-  integrity: string,
+  integrity: string | undefined,
   testReady: () => boolean,
 ): Promise<void> {
   if (testReady()) {
@@ -128,7 +124,9 @@ function loadExternalScript(
     script.src = src;
     script.async = true;
     script.crossOrigin = 'anonymous';
-    script.integrity = integrity;
+    if (integrity) {
+      script.integrity = integrity;
+    }
     script.dataset.webimMd = src;
     script.onload = () => {
       script.dataset.loaded = '1';
@@ -148,12 +146,8 @@ async function loadMarkdownRuntime(): Promise<void> {
   }
 
   markdownRuntimePromise ??= Promise.all([
-    loadExternalScript(MARKED_CDN_URL, MARKED_CDN_INTEGRITY, () => !!window.marked?.parse),
-    loadExternalScript(
-      DOMPURIFY_CDN_URL,
-      DOMPURIFY_CDN_INTEGRITY,
-      () => !!window.DOMPurify?.sanitize,
-    ),
+    loadExternalScript(MARKED_CDN_URL, undefined, () => !!window.marked?.parse),
+    loadExternalScript(DOMPURIFY_CDN_URL, undefined, () => !!window.DOMPurify?.sanitize),
   ]).then(() => undefined);
 
   try {
@@ -211,6 +205,7 @@ export const WebImPage: Component = () => {
   const [bound, setBound] = createSignal<boolean | null>(null);
   const [wsReady, setWsReady] = createSignal(false);
   const [sending, setSending] = createSignal(false);
+  const [agentThinking, setAgentThinking] = createSignal(false);
   const [markdownPreview, setMarkdownPreview] = createSignal(false);
   const [markdownPreviewLoading, setMarkdownPreviewLoading] = createSignal(false);
   let fileRef: HTMLInputElement | undefined;
@@ -289,12 +284,14 @@ export const WebImPage: Component = () => {
 
     socket.onclose = () => {
       setWsReady(false);
+      setAgentThinking(false);
       clearHeartbeat();
       scheduleReconnect();
     };
 
     socket.onerror = () => {
       setWsReady(false);
+      setAgentThinking(false);
     };
 
     socket.onmessage = (ev: MessageEvent<string>) => {
@@ -312,6 +309,7 @@ export const WebImPage: Component = () => {
       if (role !== 'assistant') {
         return;
       }
+      setAgentThinking(false);
       const seq = typeof data.seq === 'number' ? data.seq : 0;
       const text = typeof data.text === 'string' ? data.text : '';
       const ts_ms = typeof data.ts_ms === 'number' ? data.ts_ms : undefined;
@@ -393,6 +391,11 @@ export const WebImPage: Component = () => {
     sendStatus: NonNullable<LocalWebImMessage['sendStatus']>,
   ) => {
     setMessages((prev) => prev.map((m) => (m.localId === localId ? { ...m, sendStatus } : m)));
+    if (sendStatus === 'sent') {
+      setAgentThinking(true);
+    } else if (sendStatus === 'failed') {
+      setAgentThinking(false);
+    }
   };
 
   const postLocalMessage = async (message: LocalWebImMessage) => {
@@ -549,6 +552,18 @@ export const WebImPage: Component = () => {
                 </div>
               )}
             </For>
+            <Show when={agentThinking()}>
+              <div class="flex items-start gap-2 self-start">
+                <div class="rounded-[var(--radius-md)] px-3 py-2 text-[0.88rem] bg-white/6">
+                  <span class="inline-flex items-center gap-1.5 text-[var(--color-text-muted)]">
+                    <span class="thinking-dot" style="animation-delay: 0s"></span>
+                    <span class="thinking-dot" style="animation-delay: 0.18s"></span>
+                    <span class="thinking-dot" style="animation-delay: 0.36s"></span>
+                    <span class="ml-1">{t('webimThinking') as string}</span>
+                  </span>
+                </div>
+              </div>
+            </Show>
             <Show when={!wsReady() || messages().length === 0}>
               <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
                 <p

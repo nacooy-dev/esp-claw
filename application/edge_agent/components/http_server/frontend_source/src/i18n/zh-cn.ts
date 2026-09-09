@@ -1,7 +1,7 @@
 import type { Dict } from './en';
 
 export const zhCn: Dict = {
-  docTitle: 'ESP-Claw 设置',
+  docTitle: 'CyberZ',
   pageTitle: '设备设置',
   pageSubtitle: '查看系统运作基本信息与状态',
 
@@ -12,9 +12,6 @@ export const zhCn: Dict = {
   openMenu: '打开导航菜单',
   toggleSidebar: '切换侧边栏',
   closeMenu: '关闭导航菜单',
-  externalHome: '主页',
-  externalDocs: '文档',
-  externalGithub: 'GitHub',
 
   navStatus: '系统状态',
   navSystemSettings: '系统设置',
@@ -28,13 +25,14 @@ export const zhCn: Dict = {
   navFiles: '文件管理',
   navWebIm: '在线聊天',
 
-  webimDesc: '通过 WebSocket 与 ESP-Claw 实时互动。',
+  webimDesc: '通过 WebSocket 与 CyberZ 实时互动。',
   webimSend: '发送',
   webimOnline: '在线',
   webimPlaceholder: '输入消息…',
   webimAttach: '图片',
   webimNoBind: 'Web 聊天尚未就绪（设备仍在启动或未启用本地 IM）。请等待 Agent 完成启动。',
   webimEmpty: '尚无消息',
+  webimThinking: '思考中',
   webimPendingFiles: '待发送附件',
   webimUploaded: '图片已上传，点击发送即可发出。',
   webimSendShortcut: 'Ctrl+Enter 发送',
@@ -175,7 +173,7 @@ export const zhCn: Dict = {
   wechatLoginOpenLink: '打开登录链接',
 
   sectionWebReqSearch: '搜索',
-  webreqSearchNote: '可选。如填写，ESP-Claw 可在运行中检索在线资源。',
+  webreqSearchNote: '可选。如填写，CyberZ 可在运行中检索在线资源。',
   sectionWebReqNetwork: '网络请求',
   webreqBraveKey: 'Brave Search API Key',
   webreqTavilyKey: 'Tavily API Key',

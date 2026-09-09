@@ -286,8 +286,28 @@ export const Sidebar: Component<SidebarProps> = (props) => {
             <Show
               when={isMobileDrawer()}
               fallback={
-                <span class="block text-[0.7rem] font-bold text-[var(--color-text-muted)] truncate">
-                  ESP-Claw Web Config
+                <span class="flex items-center gap-1.5">
+                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect
+                      x="1.5"
+                      y="1.5"
+                      width="21"
+                      height="21"
+                      rx="5.5"
+                      stroke="#22d3ee"
+                      stroke-width="1.6"
+                    />
+                    <path
+                      d="M8.2 8.6h7.6L8.2 15.4h7.6"
+                      stroke="#22d3ee"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="block text-[0.7rem] font-bold tracking-wide text-[var(--color-text-primary)] truncate">
+                    CyberZ
+                  </span>
                 </span>
               }
             >

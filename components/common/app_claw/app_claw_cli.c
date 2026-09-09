@@ -751,7 +751,7 @@ esp_err_t app_claw_cli_start(void)
 
     ESP_LOGI(TAG, "Starting console REPL");
 
-    repl_config.prompt = "app> ";
+    repl_config.prompt = "cyberz> ";
     repl_config.task_stack_size = 10240;
     repl_config.max_cmdline_length = 512;
 

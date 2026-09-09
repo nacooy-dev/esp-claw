@@ -33,6 +33,29 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
 }
 
+/* Web IM "thinking" indicator */
+.thinking-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-text-muted);
+  animation: thinking-bounce 1.2s infinite ease-in-out;
+}
+
+@keyframes thinking-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
 @layer base {
   html {
     background: var(--color-bg-base);
