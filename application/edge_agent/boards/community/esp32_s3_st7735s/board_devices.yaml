@@ -40,20 +40,3 @@ devices:
     version: default
     peripherals:
       - name: ledc_backlight
-
-  # TGAM1 EEG Module (UART1)
-  # Pin mapping:
-  #   TXD → GPIO18 (UART1 RX)
-  #   RXD → GPIO17 (UART1 TX)
-  - name: tgam1
-    chip: tgam
-    type: custom
-    version: 1.0.0
-    init_skip: true
-    config:
-      uart_port: 1
-      baudrate: 9600
-      rx_gpio: 18
-      tx_gpio: 17
-    peripherals:
-      - name: uart1_tgam

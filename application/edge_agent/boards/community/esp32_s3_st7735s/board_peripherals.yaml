@@ -1,22 +1,6 @@
 version: 1.0.0
-# Peripherals for ESP32-S3-DevKitC-1 + ST7735S Display + TGAM1
+# Peripherals for ESP32-S3-DevKitC-1 + ST7735S Display
 peripherals:
-
-  # UART1 for TGAM1 (GPIO17=TX, GPIO18=RX)
-  - name: uart1_tgam
-    type: uart
-    role: master
-    config:
-      port: 1
-      tx_io_num: 17
-      rx_io_num: 18
-      baud_rate: 9600
-      data_bits: 8
-      parity: UART_PARITY_DISABLE
-      stop_bits: 1
-      flow_ctrl: UART_HW_FLOWCTRL_DISABLE
-      rx_buffer_size: 1024
-      tx_buffer_size: 1024
 
   # SPI2_HOST for ST7735S Display (SCLK=GPIO5, MOSI=GPIO7)
   - name: spi_display
@@ -25,9 +9,8 @@ peripherals:
     config:
       spi_bus_config:
         spi_port: SPI2_HOST
-        mosi_io_num: 7
-        miso_io_num: -1
-        sclk_io_num: 5
+        data0_io_num: 7                   # MOSI_IO_NUM
+        sclk_io_num: 5                    # SPI Clock signal
         max_transfer_sz: 4096
 
   # LEDC for display backlight control (GPIO46)
@@ -36,9 +19,7 @@ peripherals:
     version: default
     config:
       gpio_num: 46
-      speed_mode: LEDC_LOW_SPEED_MODE
-      channel: 0
-      timer_sel: 0
-      duty: 512
+      freq_hz: 5000
+      duty: 0
       duty_resolution: LEDC_TIMER_10_BIT
-      output_invert: false
+      output_invert: true
