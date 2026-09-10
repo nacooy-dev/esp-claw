@@ -77,15 +77,15 @@ peripherals:
       flags:
         with_dma: true
 
-  # === UART1 — TGAM1 (GPIO10=TX, GPIO9=RX) ===
+  # === UART1 — TGAM1 (GPIO17=TX, GPIO18=RX) @ 9600 ===
   - name: uart_tgam
     type: uart
     config:
       uart_num: UART_NUM_1
-      tx_io_num: 10
-      rx_io_num: 9
+      tx_io_num: 17
+      rx_io_num: 18
       uart_config:
-        baud_rate: 57600
+        baud_rate: 9600
         data_bits: UART_DATA_8_BITS
         parity: UART_PARITY_DISABLE
         stop_bits: UART_STOP_BITS_1
