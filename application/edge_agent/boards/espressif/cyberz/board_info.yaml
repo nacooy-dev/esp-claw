@@ -1,4 +1,4 @@
 board: cyberz
 chip: esp32s3
-description: "CyberZ - ESP32-S3-DevKitC-1 + ST7789 2.8inch + TGAM1"
+description: "CyberZ v2 — ESP32-S3-DevKitC-1 + ST7735S SPI + SSD1306 I2C OLED + I2S MIC/SPK + TGAM1"
 manufacturer: "CyberZ"

@@ -1,7 +1,52 @@
 version: 1.0.0
-# Devices Configuration
+# Devices for CyberZ v2 — 融合小智板配件
 devices:
 
+  # I2S 麦克风 INMP441（标准 audio_codec，board_manager 自动处理）
+  - name: mic
+    chip: inmp441
+    type: audio_codec
+    version: default
+    peripherals:
+      - name: i2s_audio_in
+
+  # I2S 功放 MAX98357A（标准 audio_codec，board_manager 自动处理）
+  - name: speaker
+    chip: max98357a
+    type: audio_codec
+    version: default
+    peripherals:
+      - name: i2s_audio_out
+
+  # 0.91" SSD1306 OLED（通过 I2C1 + Lua require("ssd1306") 直驱，不注册为 display_lcd 设备）
+  # I2C1 外设已在 board_peripherals.yaml 中定义（i2c_oled），Lua 可直接使用
+
+  # ST7735S 1.8" SPI 屏 (SPI2, GPIO11=SCLK, GPIO12=MOSI, GPIO13=CS, GPIO14=DC)
+  - name: display_lcd
+    chip: st7735s
+    type: display_lcd
+    sub_type: spi
+    version: default
+    config:
+      mirror_x: false
+      mirror_y: false
+      swap_xy: false
+      invert_color: false
+      x_max: 128
+      y_max: 160
+      io_spi_config:
+        cs_gpio_num: 13
+        dc_gpio_num: 14
+        spi_mode: 0
+        pclk_hz: 16000000
+      lcd_panel_config:
+        reset_gpio_num: -1
+        data_endian: LCD_RGB_DATA_ENDIAN_BIG
+        vendor_config: NULL
+    peripherals:
+      - name: spi_display
+
+  # WS2812 板载 LED (GPIO48)
   - name: led_strip
     chip: ws2812
     type: custom
@@ -12,81 +57,6 @@ devices:
         version: "^3.0"
         public: true
     config:
-      max_leds: 1                  # Number of LEDs in the strip
+      max_leds: 1
     peripherals:
-      - name: rmt_tx               # RMT TX peripheral used by the LED strip
-
-  - name: fake_audio_dac # Just for invoking audio dependencies, no actual DAC hardware connected
-    chip: none
-    type: audio_codec
-    version: default
-    init_skip: true
-    peripherals:
-      - name: i2s_audio_out
-
-  - name: fake_camera # Just for invoking camera dependencies, no actual camera hardware connected
-    type: camera
-    version: default
-    sub_type: "dvp"
-    init_skip: true
-    peripherals:
-      - name: i2c_master                   # Must match a periph_i2c name; provides SCCB i2c_handle to esp_video
-        frequency: 100000                   # SCCB I2C frequency (Hz)
-
-  - name: camera
-    type: custom
-    version: default
-    dependencies:
-      espressif/usb_host_uvc: "2.4.2"
-
-  - name: audio_dac
-    type: custom
-    version: default
-    dependencies:
-      espressif/usb_host_uac: "^1.4.0"
-    config:
-      sample_rate_hz: 16000           # Sample rate in Hz
-
-  - name: audio_adc
-    type: custom
-    version: default
-    config:
-      sample_rate_hz: 16000           # Sample rate in Hz
-
-
-  - name: display_lcd
-    chip: st7789
-    type: display_lcd
-    sub_type: spi
-    version: default
-    config:
-      mirror_x: false
-      mirror_y: true
-      swap_xy: true
-      invert_color: true
-      x_max: 320
-      y_max: 240
-      # esp_lcd_panel_io_spi_config_t fields
-      io_spi_config:
-        cs_gpio_num: 15
-        dc_gpio_num: 7
-        spi_mode: 0
-        pclk_hz: 40000000
-
-      lcd_panel_config:
-        reset_gpio_num: 6
-        data_endian: LCD_RGB_DATA_ENDIAN_BIG
-        vendor_config: NULL
-    peripherals:
-      - name: spi_display
-
-  # Display backlight control (fix: official breadboard never initialized
-  # ledc_backlight because no device referenced it, so GPIO16 stayed idle
-  # and the screen backlight was never turned on by firmware)
-  - name: lcd_brightness
-    type: ledc_ctrl
-    version: default
-    config:
-      default_percent: 100
-    peripherals:
-      - name: ledc_backlight
+      - name: rmt_tx

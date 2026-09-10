@@ -1,83 +1,91 @@
 version: 1.0.0
-# Peripherals Configuration
+# Peripherals for CyberZ v2 — 融合小智板音频 + SPI LCD 迁移到 SPI2
 peripherals:
-  - name: rmt_tx
-    type: rmt
-    role: tx
-    config:
-      gpio_num: 38
-      clk_src: RMT_CLK_SRC_DEFAULT
-      resolution_hz: 10000000
-      mem_block_symbols: 64
-      trans_queue_depth: 4
-      intr_priority: 1
-      flags:
-        invert_out: false
-        with_dma: true  # RMT peripheral can connect to DMA channel in esp32s3
-        io_loop_back: false
-        io_od_mode: false
-        allow_pd: false
-        init_level: false
 
-  - name: i2c_master
-    type: i2c
-    role: master
-    config:
-      port: 0
-      pins:
-        sda: 2
-        scl: 3
-
-  - name: i2s_audio_out
+  # === I2S 麦克风 INMP441 (I2S0, STD stereo) ===
+  - name: i2s_audio_in
     type: i2s
     role: master
-    format: pdm-out
+    format: std-in
     config:
+      port: 0
       sample_rate_hz: 16000
       clk_src: I2S_CLK_SRC_DEFAULT
       mclk_multiple: 256
-      up_sample_fp: 960
-      up_sample_fs: 441
-      bclk_div: 8
       data_bit_width: 16
       slot_bit_width: I2S_SLOT_BIT_WIDTH_AUTO
-      slot_mode: I2S_SLOT_MODE_MONO
-      slot_mask: I2S_PDM_SLOT_LEFT
-      data_fmt: "I2S_PDM_DATA_FMT_PCM"
-      sd_prescale: 0
-      sd_scale: I2S_PDM_SIG_SCALING_MUL_4
-      hp_scale: I2S_PDM_SIG_SCALING_MUL_4
-      lp_scale: I2S_PDM_SIG_SCALING_MUL_4
-      sinc_scale: I2S_PDM_SIG_SCALING_MUL_4
-      line_mode: I2S_PDM_TX_ONE_LINE_CODEC
-      hp_en: false
-      hp_cut_off_freq_hz: 35.5
-      sd_dither: 0
-      sd_dither2: 1
+      slot_mode: I2S_SLOT_MODE_STEREO
+      slot_mask: I2S_STD_SLOT_LEFT
       pins:
-        dout: 9                    # [IO] Data output pin
-      invert_flags:
-        clk_inv: false
+        bclk: 5
+        ws: 4
+        din: 6
 
-  # LCD SPI Configuration for ST7789 QSPI
+  # === I2S 功放 MAX98357A (I2S1, STD stereo) ===
+  - name: i2s_audio_out
+    type: i2s
+    role: master
+    format: std-out
+    config:
+      port: 1
+      sample_rate_hz: 16000
+      clk_src: I2S_CLK_SRC_DEFAULT
+      mclk_multiple: 256
+      data_bit_width: 16
+      slot_bit_width: I2S_SLOT_BIT_WIDTH_AUTO
+      slot_mode: I2S_SLOT_MODE_STEREO
+      slot_mask: I2S_STD_SLOT_BOTH
+      pins:
+        mclk: -1
+        bclk: 15
+        ws: 16
+        dout: 7
+        din: -1
+
+  # === I2C1 — 用于 0.91" SSD1306 OLED (GPIO41/42)，Lua 直驱 ===
+  - name: i2c_oled
+    type: i2c
+    role: master
+    config:
+      port: 1
+      pins:
+        sda: 41
+        scl: 42
+
+  # === SPI2 — ST7735S 屏 (GPIO11=SCLK, GPIO12=MOSI) ===
   - name: spi_display
     type: spi
     role: master
     config:
-      # spi_bus_config_t fields
       spi_bus_config:
-        spi_port: SPI3_HOST               # 0: SPI1_HOST, 1: SPI2_HOST, 2: SPI3_HOST
-        data0_io_num: 5                   # MOSI_IO_NUM
-        sclk_io_num: 4                    # SPI Clock signal
-        max_transfer_sz: 6400             # Maximum transfer size in bytes : width * 2 * 10
+        spi_port: SPI2_HOST
+        mosi_io_num: 12
+        miso_io_num: -1
+        sclk_io_num: 11
+        max_transfer_sz: 3200
 
-  # LCD BACKLIGHT CONTROL
-  - name: ledc_backlight
-    type: ledc
-    role: none
+  # === WS2812 — 板载 LED (GPIO48) ===
+  - name: rmt_tx
+    type: rmt
+    role: tx
     config:
-      gpio_num: 16
-      freq_hz: 5000
-      duty: 0
-      duty_resolution: LEDC_TIMER_10_BIT
-      output_invert: false
+      gpio_num: 48
+      clk_src: RMT_CLK_SRC_DEFAULT
+      resolution_hz: 10000000
+      mem_block_symbols: 64
+      trans_queue_depth: 4
+      flags:
+        with_dma: true
+
+  # === UART1 — TGAM1 (GPIO10=TX, GPIO9=RX) ===
+  - name: uart_tgam
+    type: uart
+    config:
+      uart_num: UART_NUM_1
+      tx_io_num: 10
+      rx_io_num: 9
+      uart_config:
+        baud_rate: 57600
+        data_bits: UART_DATA_8_BITS
+        parity: UART_PARITY_DISABLE
+        stop_bits: UART_STOP_BITS_1
