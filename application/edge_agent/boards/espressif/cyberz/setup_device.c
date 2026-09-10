@@ -6,6 +6,7 @@
 #include "sdkconfig.h"
 #include "esp_log.h"
 #include "esp_lcd_panel_st7789.h"
+#include "esp_lcd_panel_ops.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
