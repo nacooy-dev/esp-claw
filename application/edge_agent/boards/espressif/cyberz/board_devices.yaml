@@ -40,7 +40,7 @@ devices:
         spi_mode: 0
         pclk_hz: 16000000
       lcd_panel_config:
-        reset_gpio_num: -1
+        reset_gpio_num: 8
         data_endian: LCD_RGB_DATA_ENDIAN_BIG
         vendor_config: NULL
     peripherals:
