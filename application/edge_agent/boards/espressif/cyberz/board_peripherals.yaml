@@ -1,46 +1,30 @@
 version: 1.0.0
-# Peripherals for CyberZ v2 — 融合小智板音频 + SPI LCD 迁移到 SPI2
+# Peripherals Configuration
+# CyberZ 原生 ST7789 240x320 (SPI3) + TGAM1 (UART1) + WS2812 (RMT) + OLED (I2C1)
 peripherals:
 
-  # === I2S 麦克风 INMP441 (I2S0, STD stereo) ===
-  - name: i2s_audio_in
-    type: i2s
+  # === LCD SPI — ST7789 (SPI3: SCLK=GPIO4, MOSI=GPIO5) ===
+  - name: spi_display
+    type: spi
     role: master
-    format: std-in
     config:
-      port: 0
-      sample_rate_hz: 16000
-      clk_src: I2S_CLK_SRC_DEFAULT
-      mclk_multiple: 256
-      data_bit_width: 16
-      slot_bit_width: I2S_SLOT_BIT_WIDTH_AUTO
-      slot_mode: I2S_SLOT_MODE_STEREO
-      slot_mask: I2S_STD_SLOT_LEFT
-      pins:
-        bclk: 5
-        ws: 4
-        din: 6
+      # spi_bus_config_t fields
+      spi_bus_config:
+        spi_port: SPI3_HOST               # 0: SPI1_HOST, 1: SPI2_HOST, 2: SPI3_HOST
+        data0_io_num: 5                   # MOSI_IO_NUM
+        sclk_io_num: 4                    # SPI Clock signal
+        max_transfer_sz: 6400             # Maximum transfer size in bytes : width * 2 * 10
 
-  # === I2S 功放 MAX98357A (I2S1, STD stereo) ===
-  - name: i2s_audio_out
-    type: i2s
-    role: master
-    format: std-out
+  # === LCD BACKLIGHT CONTROL (GPIO16, LEDC, 由 lcd_brightness 设备驱动) ===
+  - name: ledc_backlight
+    type: ledc
+    role: none
     config:
-      port: 1
-      sample_rate_hz: 16000
-      clk_src: I2S_CLK_SRC_DEFAULT
-      mclk_multiple: 256
-      data_bit_width: 16
-      slot_bit_width: I2S_SLOT_BIT_WIDTH_AUTO
-      slot_mode: I2S_SLOT_MODE_STEREO
-      slot_mask: I2S_STD_SLOT_BOTH
-      pins:
-        mclk: -1
-        bclk: 15
-        ws: 16
-        dout: 7
-        din: -1
+      gpio_num: 16
+      freq_hz: 5000
+      duty: 0
+      duty_resolution: LEDC_TIMER_10_BIT
+      output_invert: false
 
   # === I2C1 — 用于 0.91" SSD1306 OLED (GPIO41/42)，Lua 直驱 ===
   - name: i2c_oled
@@ -52,19 +36,7 @@ peripherals:
         sda: 41
         scl: 42
 
-  # === SPI2 — ST7735S 屏 (GPIO11=SCLK, GPIO12=MOSI) ===
-  - name: spi_display
-    type: spi
-    role: master
-    config:
-      spi_bus_config:
-        spi_port: SPI2_HOST
-        mosi_io_num: 12
-        miso_io_num: -1
-        sclk_io_num: 11
-        max_transfer_sz: 3200
-
-  # === WS2812 — 板载 LED (GPIO48) ===
+  # === WS2812 — 板载 LED (GPIO48；原生 GPIO38 撞 flash IO4，已修正) ===
   - name: rmt_tx
     type: rmt
     role: tx

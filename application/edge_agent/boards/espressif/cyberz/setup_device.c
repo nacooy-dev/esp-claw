@@ -20,9 +20,9 @@ esp_err_t lcd_panel_factory_entry_t(esp_lcd_panel_io_handle_t io,
     memcpy(&panel_dev_cfg, panel_dev_config, sizeof(esp_lcd_panel_dev_config_t));
     int ret = esp_lcd_new_panel_st7789(io, &panel_dev_cfg, ret_panel);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "New st7789/st7735s panel failed: %s", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "New st7789 panel failed: %s", esp_err_to_name(ret));
         return ret;
     }
-    ESP_LOGI(TAG, "ST7735S (st7789 driver) panel created");
+    ESP_LOGI(TAG, "ST7789 panel created (240x320, SPI3)");
     return ESP_OK;
 }
